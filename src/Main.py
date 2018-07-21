@@ -1,5 +1,5 @@
 # time libraries
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 # types
 from typing import Union
@@ -12,28 +12,71 @@ from argparse import ArgumentParser, Namespace
 # and print it out.
 def main():
 
-    arg_parser: ArgumentParser = ArgumentParser(description="Calculate time in X Hrs : X Mins : X Secs from now.")
+    arg_parser: ArgumentParser = ArgumentParser(description="Time until, and from calculation tool")
 
-    arg_parser.add_argument('--time', dest="user_time_string", help="Specify the amount of time "
-                                                                    "in the format HH:MM:SS "
-                                                                    "from now to calculate that "
-                                                                    "time.")
+    arg_parser.add_argument('-t_f', dest="user_time_from", help="Specify the amount of time "
+                                                                "in the format HH:MM:SS "
+                                                                "to calculate what time it will be "
+                                                                " at the time specified, from now.")
+
+    arg_parser.add_argument('-t_u', dest="user_time_until", help="Specify the time in the format "
+                                                                 "HH:MM:SS military time tomorrow "
+                                                                 "to calculate the amount of time "
+                                                                 "between then and now.")
     # retrieve user time string from argument parser
     parsed_args: Namespace = arg_parser.parse_args()
 
-    # verify and parse user specified string
-    parsed_user_time: Union[timedelta, None] = parse_input_time(parsed_args.user_time_string)
+    # execute the option the user specified
+    time_from: str = parsed_args.user_time_from
+    time_until: str = parsed_args.user_time_until
 
-    if parsed_user_time is not None:
+    if time_from is not None:
+        # parse the user provided into a timedelta
+        parsed_user_time: Union[timedelta, None] = parse_input_time(time_from)
+
+        # execute the action specified by the user
+        execution_success: bool = calculate_time_from(parsed_user_time)
+
+        # if the action fails, display the help message
+        if not execution_success:
+            arg_parser.print_help()
+
+    elif time_until is not None:
+        parsed_user_time: Union[timedelta, None] = parse_input_time(time_until)
+
+        execution_success: bool = calculate_time_until(parsed_user_time)
+
+        if not execution_success:
+            arg_parser.print_help()
+
+
+def calculate_time_from(user_time_arg: timedelta) -> bool:
+
+    if user_time_arg is not None:
         # get the current time
         current_time: datetime = datetime.now()
 
         # calculate requested time
-        print("Time " + str(parsed_user_time) + " from now: " + str((current_time + parsed_user_time).time()
-                                                                    .strftime("%I:%M:%S %p")))
-    else:
-        print("Error. Invalid time specified")
-        arg_parser.print_help()
+        print("Time " + str(user_time_arg) + " from now: " + str((current_time + user_time_arg).time()
+                                                                 .strftime("%I:%M:%S %p")))
+        return True
+
+    return False
+
+
+def calculate_time_until(user_time_arg: timedelta) -> bool:
+    if user_time_arg is not None:
+
+        right_now = datetime.now()
+        tomorrow_midnight: datetime = datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)
+
+        amount_of_time: timedelta = (tomorrow_midnight + user_time_arg) - right_now
+
+        print("Amount of time until " + str(user_time_arg) + " tomorrow: " + str(amount_of_time.seconds // 3600) +
+              "H " + str((amount_of_time.seconds // 60) % 60) + "M")
+        return True
+
+    return False
 
 
 # returns None on invalid input.
@@ -42,6 +85,10 @@ def parse_input_time(arg: str) -> Union[timedelta, None]:
     minutes: str = "0"
     seconds: str = "0"
     colon_counter: int = 0
+
+    # Make sure that the string passed is iterable if not. return None.
+    if arg is None:
+        return None
 
     # look at what the user has passed, make sure that all contents are either
     # a digit or a colon. Parse the verified input into a timedelta and return
