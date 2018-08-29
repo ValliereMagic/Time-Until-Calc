@@ -1,15 +1,16 @@
 # time libraries
 from datetime import datetime, timedelta, time
 
-# types
-from typing import Union
-
 # command line arguments
 from argparse import ArgumentParser, Namespace
 
 
-# grab CLI argument, parse into a time delta, calculate the time in that amount of time
-# and print it out.
+"""
+grab CLI argument, parse into a time delta, calculate the time in that amount of time
+and print it out.
+"""
+
+
 def main():
 
     arg_parser: ArgumentParser = ArgumentParser(description="Time until, and from calculation tool")
@@ -32,7 +33,7 @@ def main():
 
     if time_from is not None:
         # parse the user provided into a timedelta
-        parsed_user_time: Union[timedelta, None] = parse_input_time(time_from)
+        parsed_user_time: timedelta or None = parse_input_time(time_from)
 
         # execute the action specified by the user
         execution_success: bool = calculate_time_from(parsed_user_time)
@@ -42,12 +43,17 @@ def main():
             arg_parser.print_help()
 
     elif time_until is not None:
-        parsed_user_time: Union[timedelta, None] = parse_input_time(time_until)
+        parsed_user_time: timedelta or None = parse_input_time(time_until)
 
         execution_success: bool = calculate_time_until(parsed_user_time)
 
         if not execution_success:
             arg_parser.print_help()
+
+
+"""
+Calculate the amount of time that is timedelta from now.
+"""
 
 
 def calculate_time_from(user_time_arg: timedelta) -> bool:
@@ -64,23 +70,45 @@ def calculate_time_from(user_time_arg: timedelta) -> bool:
     return False
 
 
+"""
+Calculate the amount of time until timedelta.
+If the function is executed before 3AM it will use today to calculate.
+If after 3AM it will use tomorrow.
+"""
+
+
 def calculate_time_until(user_time_arg: timedelta) -> bool:
     if user_time_arg is not None:
 
+        # using current time for starting point.
         right_now = datetime.now()
-        tomorrow_midnight: datetime = datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)
 
-        amount_of_time: timedelta = (tomorrow_midnight + user_time_arg) - right_now
+        """
+        If before 3AM on current day, calculate using today at midnight instead.
+        Otherwise user tomorrow at midnight.
+        """
+        if right_now.hour <= 3:
+            until_time: datetime = datetime.combine(datetime.today().date(), time(0, 0))
+        else:
+            until_time: datetime = datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)
 
-        print("Amount of time until " + str(user_time_arg) + " tomorrow: " + str(amount_of_time.seconds // 3600) +
+        amount_of_time: timedelta = (until_time + user_time_arg) - right_now
+
+        print("Amount of time until " + str(user_time_arg) + " " + str(amount_of_time.seconds // 3600) +
               "H " + str((amount_of_time.seconds // 60) % 60) + "M")
         return True
 
     return False
 
 
-# returns None on invalid input.
-def parse_input_time(arg: str) -> Union[timedelta, None]:
+"""
+parse the string the user has inputted in the format HH:MM:SS 
+into a timedelta.
+If the user enters an invalid string None will be returned.
+"""
+
+
+def parse_input_time(arg: str) -> timedelta or None:
     hours: str = "0"
     minutes: str = "0"
     seconds: str = "0"
@@ -90,8 +118,10 @@ def parse_input_time(arg: str) -> Union[timedelta, None]:
     if arg is None:
         return None
 
-    # look at what the user has passed, make sure that all contents are either
-    # a digit or a colon. Parse the verified input into a timedelta and return
+    """ 
+    look at what the user has passed, make sure that all contents are either
+    a digit or a colon. Parse the verified input into a timedelta and return
+    """
     for i in arg:
         digit: bool = str.isdigit(i)
         colon: bool = i == ":"
