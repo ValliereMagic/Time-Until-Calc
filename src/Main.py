@@ -13,17 +13,23 @@ and print it out.
 
 def main():
 
-    arg_parser: ArgumentParser = ArgumentParser(description="Time until, and from calculation tool")
+    arg_parser: ArgumentParser = ArgumentParser(description="Time, (until and from) calculation tool")
 
-    arg_parser.add_argument('-t_f', dest="user_time_from", help="Specify the amount of time "
-                                                                "in the format HH:MM:SS "
-                                                                "to calculate what time it will be "
-                                                                " at the time specified, from now.")
+    arg_parser.add_argument('-f', '--time-from', dest="user_time_from", help="Specify an amount of time "
+                                                                             "in the format HH:MM:SS "
+                                                                             "to calculate what time it will be "
+                                                                             "in that amount of time (from now).")
 
-    arg_parser.add_argument('-t_u', dest="user_time_until", help="Specify the time in the format "
-                                                                 "HH:MM:SS military time tomorrow "
-                                                                 "to calculate the amount of time "
-                                                                 "between then and now.")
+    arg_parser.add_argument('-u', '--time-until', dest="user_time_until", help="Specify a time in the format "
+                                                                               "HH:MM:SS in military time "
+                                                                               "to calculate the amount of time "
+                                                                               "between then and now. "
+                                                                               "If this command is executed before 3 "
+                                                                               "in the morning, it will calculate "
+                                                                               "Using today at midnight. After 3, "
+                                                                               "The calculation will be done using "
+                                                                               "tomorrow.")
+
     # retrieve user time string from argument parser
     parsed_args: Namespace = arg_parser.parse_args()
 
@@ -49,6 +55,9 @@ def main():
 
         if not execution_success:
             arg_parser.print_help()
+
+    else:
+        arg_parser.print_help()
 
 
 """
@@ -88,8 +97,11 @@ def calculate_time_until(user_time_arg: timedelta) -> bool:
         Otherwise user tomorrow at midnight.
         """
         if right_now.hour <= 3:
+            # today at midnight
             until_time: datetime = datetime.combine(datetime.today().date(), time(0, 0))
+
         else:
+            # tomorrow at midnight
             until_time: datetime = datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)
 
         amount_of_time: timedelta = (until_time + user_time_arg) - right_now
