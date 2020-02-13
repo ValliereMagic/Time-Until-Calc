@@ -13,7 +13,8 @@ and print it out.
 
 def main():
 
-    arg_parser: ArgumentParser = ArgumentParser(description="Time, (until and from) calculation tool")
+    arg_parser: ArgumentParser = ArgumentParser(
+        description="Time, (until and from) calculation tool")
 
     arg_parser.add_argument('-f', '--time-from', dest="user_time_from", help="Specify an amount of time "
                                                                              "in the format HH:MM:SS "
@@ -98,11 +99,13 @@ def calculate_time_until(user_time_arg: timedelta) -> bool:
         """
         if right_now.hour <= 3:
             # today at midnight
-            until_time: datetime = datetime.combine(datetime.today().date(), time(0, 0))
+            until_time: datetime = datetime.combine(
+                datetime.today().date(), time(0, 0))
 
         else:
             # tomorrow at midnight
-            until_time: datetime = datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)
+            until_time: datetime = datetime.combine(
+                datetime.today().date(), time(0, 0)) + timedelta(days=1)
 
         amount_of_time: timedelta = (until_time + user_time_arg) - right_now
 
