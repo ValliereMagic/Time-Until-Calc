@@ -5,13 +5,11 @@ from datetime import datetime, timedelta, time
 from argparse import ArgumentParser, Namespace
 
 
-"""
-grab CLI argument, parse into a time delta, calculate the time in that amount of time
-and print it out.
-"""
-
-
 def main():
+    """
+    grab CLI argument, parse into a time delta, calculate the time in that amount of time
+    and print it out.
+    """
 
     arg_parser: ArgumentParser = ArgumentParser(
         description="Time, (until and from) calculation tool")
@@ -61,13 +59,10 @@ def main():
         arg_parser.print_help()
 
 
-"""
-Calculate the amount of time that is timedelta from now.
-"""
-
-
 def calculate_time_from(user_time_arg: timedelta) -> bool:
-
+    """
+    Calculate the amount of time that is timedelta from now.
+    """
     if user_time_arg is not None:
         # get the current time
         current_time: datetime = datetime.now()
@@ -80,14 +75,12 @@ def calculate_time_from(user_time_arg: timedelta) -> bool:
     return False
 
 
-"""
-Calculate the amount of time until timedelta.
-If the function is executed before 3AM it will use today to calculate.
-If after 3AM it will use tomorrow.
-"""
-
-
 def calculate_time_until(user_time_arg: timedelta) -> bool:
+    """
+    Calculate the amount of time until timedelta.
+    If the function is executed before 3AM it will use today to calculate.
+    If after 3AM it will use tomorrow.
+    """
     if user_time_arg is not None:
 
         # using current time for starting point.
@@ -116,14 +109,12 @@ def calculate_time_until(user_time_arg: timedelta) -> bool:
     return False
 
 
-"""
-parse the string the user has inputted in the format HH:MM:SS 
-into a timedelta.
-If the user enters an invalid string None will be returned.
-"""
-
-
 def parse_input_time(arg: str) -> timedelta or None:
+    """
+    parse the string the user has inputted in the format HH:MM:SS 
+    into a timedelta.
+    If the user enters an invalid string None will be returned.
+    """
     hours: str = "0"
     minutes: str = "0"
     seconds: str = "0"
@@ -133,10 +124,8 @@ def parse_input_time(arg: str) -> timedelta or None:
     if arg is None:
         return None
 
-    """ 
-    look at what the user has passed, make sure that all contents are either
-    a digit or a colon. Parse the verified input into a timedelta and return
-    """
+    # look at what the user has passed, make sure that all contents are either
+    # a digit or a colon. Parse the verified input into a timedelta and return
     for i in arg:
         digit: bool = str.isdigit(i)
         colon: bool = i == ":"
