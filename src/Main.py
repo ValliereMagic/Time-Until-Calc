@@ -86,10 +86,8 @@ def calculate_time_until(user_time_arg: timedelta) -> bool:
         # using current time for starting point.
         right_now = datetime.now()
 
-        """
-        If before 3AM on current day, calculate using today at midnight instead.
-        Otherwise user tomorrow at midnight.
-        """
+        # If before 3AM on current day, calculate using today at midnight instead.
+        # Otherwise user tomorrow at midnight.
         if right_now.hour <= 3:
             # today at midnight
             until_time: datetime = datetime.combine(
