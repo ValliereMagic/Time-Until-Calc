@@ -145,9 +145,11 @@ def parse_input_time(arg: str) -> timedelta or None:
     for i in arg:
         digit: bool = str.isdigit(i)
         colon: bool = i == ":"
+        # Make sure the string we are parsing is valid
         if not digit and not colon:
             return None
-        elif digit:
+        # Parse the current character
+        if digit:
             if colon_counter == 0:
                 hours += i
 
